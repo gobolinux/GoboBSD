@@ -1,0 +1,3 @@
+GoboBSD BuildBase is being written by
+
+David Karell <mccoy at doctor dot com>

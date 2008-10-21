@@ -1,0 +1,16 @@
+diff -Naur sed-4.1.5-org/configure sed-4.1.5/configure
+--- sed-4.1.5-org/configure	2008-10-18 20:48:52.000000000 +0000
++++ sed-4.1.5/configure	2008-10-18 20:49:07.000000000 +0000
+@@ -11266,12 +11266,10 @@
+     done ;;
+     gettext-fix )
+   sed -e '/^mkinstalldirs *=/a\' \
+-      -e "install_sh=$install_sh" \
+       -e 's/^mkinstalldirs *=.*/mkinstalldirs=$(MKINSTALLDIRS)/' \
+       intl/Makefile > intl/Makefile.tmp
+   mv intl/Makefile.tmp intl/Makefile
+   sed -e '/^mkinstalldirs *=/a\' \
+-      -e "install_sh=$install_sh" \
+       -e 's/^mkinstalldirs *=.*/mkinstalldirs=$(MKINSTALLDIRS)/' \
+       po/Makefile > po/Makefile.tmp
+   mv po/Makefile.tmp po/Makefile ;;
