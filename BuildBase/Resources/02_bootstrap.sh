@@ -2,30 +2,35 @@
 
 umask 022
 
-SCRIPTDIR=$(pwd)
-if [ ! -f "${SCRIPTDIR}/02_bootstrap.sh" ]; then
+bootstrapScriptsDir=$(pwd)
+if [ ! -f "${bootstrapScriptsDir}/02_bootstrap.sh" ]; then
   echo Please execute $0 from its directory
-  exit
+  exit 201
 fi
 
-ROOT=
-PROGBASE=${ROOT}/Programs/Bootstrap
-PROGVER=1.0
-PROGDEST=${PROGBASE}/${PROGVER}
-
-if [ ! -d ${PROGDEST} ]; then
-  mkdir -p ${PROGDEST}
+# In case DESTDIR for some reason lives on, BSD make would
+# start installing stuff in the wrong places
+if [ "x${DESTDIR}" != "x" ]; then
+  echo DESTDIR variable should not be set! Unsetting it!
+  unset DESTDIR
 fi
 
-if [ ! -d ${PROGDEST}/bin ]; then
-  mkdir ${PROGDEST}/bin
+. ./bootstrap_env.inc
+
+if [ ! -d ${bootstrapDest} ]; then
+  mkdir -p ${bootstrapDest}
 fi
 
-if [ ! -d ${PROGDEST}/lib ]; then
-  mkdir ${PROGDEST}/lib
+if [ ! -d ${bootstrapDest}/bin ]; then
+  mkdir ${bootstrapDest}/bin
 fi
 
-chown -R fibo ${PROGBASE}
-chown -R fibo ${SCRIPTDIR}
+if [ ! -d ${bootstrapDest}/lib ]; then
+  mkdir ${bootstrapDest}/lib
+fi
 
-su fibo ./03_bootstrap_build.sh
+chown -R fibo ${bootstrapBase}
+chown -R fibo ${bootstrapScriptsDir}
+
+su fibo ./bootstrap_build.sh || exit 200
+./bootstrap_finalize.sh

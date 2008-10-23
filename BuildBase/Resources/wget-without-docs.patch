@@ -1,0 +1,12 @@
+diff -Naur wget-1.11.4-orig/Makefile.in wget-1.11.4/Makefile.in
+--- wget-1.11.4-orig/Makefile.in	2008-10-22 16:54:49.000000000 +0000
++++ wget-1.11.4/Makefile.in	2008-10-22 19:24:35.000000000 +0000
+@@ -83,7 +83,7 @@
+ manext='$(manext)'
+ 
+ # subdirectories in the distribution
+-SUBDIRS = src doc po tests util windows
++SUBDIRS = src po tests util windows
+ 
+ # default target
+ all: src/config.h Makefile $(SUBDIRS)

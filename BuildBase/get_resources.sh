@@ -74,11 +74,11 @@ if [ ! -f $PKG ]; then
   fetch ${BASEURL}${PKG}
 fi
 
-#BASEURL="$ftpGnu/grep/"
-#PKG="grep-2.5.3.tar.bz2"
-#if [ ! -f $PKG ]; then
-#  fetch ${BASEURL}${PKG}
-#fi
+BASEURL="$ftpGnu/grep/"
+PKG="grep-2.5.3.tar.bz2"
+if [ ! -f $PKG ]; then
+  fetch ${BASEURL}${PKG}
+fi
 
 BASEURL="$ftpGnu/wget/"
 PKG="wget-1.11.4.tar.gz"
@@ -103,6 +103,39 @@ PKG="autoconf-2.62.tar.lzma"
 if [ ! -f $PKG ]; then
   fetch ${BASEURL}${PKG}
 fi
+
+BASEURL="$ftpGnu/m4/"
+PKG="m4-1.4.11.tar.lzma"
+if [ ! -f $PKG ]; then
+  fetch ${BASEURL}${PKG}
+fi
+
+BASEURL="$ftpGnu/libtool/"
+PKG="libtool-2.2.6a.tar.lzma"
+if [ ! -f $PKG ]; then
+  fetch ${BASEURL}${PKG}
+fi
+
+BASEURL="ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/"
+PKG="pcre-7.7.tar.bz2"
+if [ ! -f $PKG ]; then
+  fetch ${BASEURL}${PKG}
+fi
+
+BASEURL="http://kundor.org/gobo/packages/official/"
+PKG="Scripts--2.9.4--i686.tar.bz2"
+if [ ! -f ${PKG} ]; then
+  fetch -o ${PKG} ${BASEURL}${PKG}
+fi
+
+BASEURL="$ftpGnu/make/"
+PKG="make-3.81.tar.bz2"
+if [ ! -f ${PKG} ]; then
+  fetch -o ${PKG} ${BASEURL}${PKG}
+fi
+
+
+
 
 cd ..
 

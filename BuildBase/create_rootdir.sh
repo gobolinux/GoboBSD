@@ -99,7 +99,7 @@ tar cf - -C ${DESTDIR}/libexec ${DYNLINKER} | tar xpf - -C ${BASEDIR}/${BASEREL}
 tar cf - -C ${DESTDIR}/usr include/ | tar xpf - -C ${BASEDIR}/${BASEREL}
 
 # Stuff needed to build programs
-BUILDPROGS="cc gcc as ld ar ranlib nm strip CC c++ g++ cpp"
+BUILDPROGS="cc gcc as ld ar ranlib nm size strip CC c++ g++ cpp"
 BUILDLIBEXEC="cc1 cc1plus"
 BUILDLIBS='*.o libstdc++* libc.* libc_* libgcc* libpthread* libthr.so libm.so libcrypt.so'
 BUILDLIBS=$(cd ${DESTDIR}/usr/lib; echo ${BUILDLIBS})
@@ -141,7 +141,8 @@ tar cf - -C ${DESTDIR}/usr/bin \
   -C ${DESTDIR}/sbin ${SBINPROGS} \
   | tar -xpf - -C ${BASEDIR}/${BASEREL}/bin
 
-ln install ${BASEDIR}/${BASEREL}/bin/real_install
+mv ${BASEDIR}/${BASEREL}/bin/make ${BASEDIR}/${BASEREL}/bin/fmake
+ln -s fmake ${BASEDIR}/${BASEREL}/bin/make
 
 cat > ${BASEDIR}/Settings/shells << "EOF"
 /bin/bash
@@ -200,6 +201,9 @@ tar cf - -C ${DESTDIR}/etc ./master.passwd ./passwd ./group ./spwd.db ./pwd.db .
 
 # Need to add this symlink temporarily, until superuser has changed the homedirectory
 ln -s /Users/root ${ROOTDIR}
+
+# Copy /etc/resolv.conf from main system
+cp /etc/resolv.conf ${ROOTDIR}/etc
 
 cat > ${ROOTDIR}/etc/rc << "EOFRC"
 #!/bin/sh -v
