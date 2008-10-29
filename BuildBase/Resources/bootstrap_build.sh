@@ -2,22 +2,19 @@
 
 umask 022
 
-bootstrapScriptsDir=$(pwd)
 if [ ! -f "${bootstrapScriptsDir}/bootstrap_build.sh" ]; then
-  echo Please execute $0 from its directory
+  echo "Please execute $0 from its directory"
   exit 201
 fi
 
-. ./bootstrap_env.inc
-
 echo ---------------------------------------------------
-echo PATH is $PATH
-echo LD_LIBRARY_PATH is $LD_LIBRARY_PATH
-echo DESTDIR is $DESTDIR
-echo HOME is $HOME
-echo USER is $USER
+echo PATH is ${PATH}
+echo LD_LIBRARY_PATH is ${LD_LIBRARY_PATH}
+echo DESTDIR is ${DESTDIR}
+echo HOME is ${HOME}
+echo USER is ${USER}
 echo ---------------------------------------------------
-sleep 3
+sleep 5
 
 if [ ! -d build ]; then
   mkdir build
@@ -26,25 +23,29 @@ if [ ! -L ${bootstrapBase}/Current ]; then
   ln -s ${bootstrapVersion} ${bootstrapBase}/Current
 fi
 
-if [ ! -x ${bootstrapDest}/bin/sed ]; then
+if [ ! \( -x ${bootstrapDest}/bin/gsed -a -L ${bootstrapDest}/bin/sed \) ]; then
   echo ---------------------------------------------------
   echo Sed
   echo ---------------------------------------------------
-  if [ ! -d build/sed-4.1.5 ]; then
-    tar -xzf src/sed-4.1.5.tar.gz -C build
+  if [ ! -x ${bootstrapDest}/bin/gsed ]; then
+    if [ ! -d build/sed-4.1.5 ]; then
+      tar -xzf src/sed-4.1.5.tar.gz -C build
+    fi
+    cd build/sed-4.1.5
+    for f in ../../sed-*.patch; do
+      patch -Np1 < $f
+    done
+    ./configure --prefix=${bootstrapDest}
+    make
+    cp sed/sed ${bootstrapDest}/bin/gsed
+    strip ${bootstrapDest}/bin/gsed
   fi
-  cd build/sed-4.1.5
-  for f in ../../sed-*.patch; do
-    patch -Np1 < $f
-  done
-  ./configure --prefix=${bootstrapDest}
-  make
-  cp sed/sed ${bootstrapDest}/bin/sed
-  strip ${bootstrapDest}/bin/sed
 
-  if [ ! -x $bootstrapDest/bin/sed ]; then
+  if [ ! -x ${bootstrapDest}/bin/gsed ]; then
     exit 200
   fi
+
+  ln -sf gsed ${bootstrapDest}/bin/sed
   cd ../..
 fi
 
@@ -64,26 +65,125 @@ if [ ! -x ${bootstrapDest}/bin/lzcat ]; then
   cd ../..
 fi
 
-if [ ! -x ${bootstrapDest}/bin/readlink ]; then
+if [ ! \( -x ${bootstrapDest}/bin/greadlink -a -L ${bootstrapDest}/bin/readlink \) ]; then
   echo ---------------------------------------------------
   echo CoreUtils
   echo ---------------------------------------------------
-  if [ ! -d build/coreutils-6.12 ]; then
-    ${bootstrapDest}/bin/lzcat src/coreutils-6.12.tar.lzma | tar xf - -C build
+  if [ ! -x ${bootstrapDest}/bin/greadlink ]; then
+    if [ ! -d build/coreutils-6.12 ]; then
+      ${bootstrapDest}/bin/lzcat src/coreutils-6.12.tar.lzma | tar xf - -C build
+    fi
+    cd build/coreutils-6.12
+    ./configure --prefix=$bootstrapDest --program-prefix=g && \
+      make && make install
   fi
-  cd build/coreutils-6.12
-#  ./configure --prefix=$bootstrapDest --program-prefix=g && make && make install
-  ./configure --prefix=${bootstrapDest} && make && make install
 
-  if [ ! -x ${bootstrapDest}/bin/readlink ]; then
+  if [ ! -x ${bootstrapDest}/bin/greadlink ]; then
     exit 200
   fi
 
-  rm ${bootstrapDest}/bin/chcon
-  rm ${bootstrapDest}/bin/runcon
-#  rm ${bootstrapDest}/bin/who
-#  rm ${bootstrapDest}/bin/whoami
-  mv ${bootstrapDest}/bin/install ${bootstrapDest}/bin/real_install
+  if [ -e ${bootstrapDest}/bin/gchcon ]; then
+    rm ${bootstrapDest}/bin/gchcon
+  fi
+
+  if [ -e ${bootstrapDest}/bin/gruncon ]; then
+    rm ${bootstrapDest}/bin/gruncon
+  fi
+
+  if [ -e ${bootstrapDest}/bin/ginstall ]; then
+    mv ${bootstrapDest}/bin/ginstall ${bootstrapDest}/bin/real_install
+  fi
+
+  # Uses system's uname, df (wrong results with coreutils),
+  # du (may switch to coreutils when tried it further),
+  # id, users, groups, who, whoami, sync, su
+  # Also, pinky is not symlinked from gpinky for now...
+  ln -sf gls ${bootstrapDest}/bin/ls
+  ln -sf gdircolors ${bootstrapDest}/bin/dircolors
+  ln -sf gdir ${bootstrapDest}/bin/dir
+  ln -sf gvdir ${bootstrapDest}/bin/vdir
+
+  ln -sf gchgrp ${bootstrapDest}/bin/chgrp
+  ln -sf gchmod ${bootstrapDest}/bin/chmod
+  ln -sf gchown ${bootstrapDest}/bin/chown
+  ln -sf gcp ${bootstrapDest}/bin/cp
+  ln -sf gdd ${bootstrapDest}/bin/dd
+  ln -sf glink ${bootstrapDest}/bin/link
+  ln -sf gln ${bootstrapDest}/bin/ln
+  ln -sf gmkdir ${bootstrapDest}/bin/mkdir
+  ln -sf gmknod ${bootstrapDest}/bin/mknod
+  ln -sf gmkfifo ${bootstrapDest}/bin/mkfifo
+  ln -sf gmktemp ${bootstrapDest}/bin/mktemp
+  ln -sf gmv ${bootstrapDest}/bin/mv
+  ln -sf grm ${bootstrapDest}/bin/rm
+  ln -sf grmdir ${bootstrapDest}/bin/rmdir
+  ln -sf gshred ${bootstrapDest}/bin/shred
+  ln -sf gtouch ${bootstrapDest}/bin/touch
+  ln -sf gunlink ${bootstrapDest}/bin/unlink
+
+  ln -sf g\[ ${bootstrapDest}/bin/\[
+  ln -sf gbase64 ${bootstrapDest}/bin/base64
+  ln -sf gbasename ${bootstrapDest}/bin/basename
+  ln -sf gchroot ${bootstrapDest}/bin/chroot
+  ln -sf gcksum ${bootstrapDest}/bin/cksum
+  ln -sf gcat ${bootstrapDest}/bin/cat
+  ln -sf gchroot ${bootstrapDest}/bin/chroot
+  ln -sf gcomm ${bootstrapDest}/bin/comm
+  ln -sf gcsplit ${bootstrapDest}/bin/csplit
+  ln -sf gcut ${bootstrapDest}/bin/cut
+  ln -sf gdate ${bootstrapDest}/bin/date
+  ln -sf gdirname ${bootstrapDest}/bin/dirname
+  ln -sf gecho ${bootstrapDest}/bin/echo
+  ln -sf genv ${bootstrapDest}/bin/env
+  ln -sf gexpr ${bootstrapDest}/bin/expr
+  ln -sf gexpand ${bootstrapDest}/bin/expand
+  ln -sf gfactor ${bootstrapDest}/bin/factor
+  ln -sf gfalse ${bootstrapDest}/bin/false
+  ln -sf gfold ${bootstrapDest}/bin/fold
+  ln -sf gfmt ${bootstrapDest}/bin/fmt
+  ln -sf ghead ${bootstrapDest}/bin/head
+  ln -sf ghostid ${bootstrapDest}/bin/hostid
+  ln -sf gjoin ${bootstrapDest}/bin/join
+  ln -sf gkill ${bootstrapDest}/bin/kill
+  ln -sf god ${bootstrapDest}/bin/od
+  ln -sf gmd5sum ${bootstrapDest}/bin/md5sum
+  ln -sf gnice ${bootstrapDest}/bin/nice
+  ln -sf gnl ${bootstrapDest}/bin/nl
+  ln -sf gnohup ${bootstrapDest}/bin/nohup
+  ln -sf gpaste ${bootstrapDest}/bin/paste
+  ln -sf gpathchk ${bootstrapDest}/bin/pathchk
+  ln -sf gpr ${bootstrapDest}/bin/pr
+  ln -sf gprintenv ${bootstrapDest}/bin/printenv
+  ln -sf gprintf ${bootstrapDest}/bin/printf
+  ln -sf gptx ${bootstrapDest}/bin/ptx
+  ln -sf gpwd ${bootstrapDest}/bin/pwd
+  ln -sf greadlink ${bootstrapDest}/bin/readlink
+  ln -sf gseq ${bootstrapDest}/bin/seq
+  ln -sf gsetuidgid ${bootstrapDest}/bin/setuidgid
+  ln -sf gsha1sum ${bootstrapDest}/bin/sha1sum
+  ln -sf gsha224sum ${bootstrapDest}/bin/sha224sum
+  ln -sf gsha256sum ${bootstrapDest}/bin/sha256sum
+  ln -sf gsha384sum ${bootstrapDest}/bin/sha384sum
+  ln -sf gsha512sum ${bootstrapDest}/bin/sha512sum
+  ln -sf gshuf ${bootstrapDest}/bin/shuf
+  ln -sf gsleep ${bootstrapDest}/bin/sleep
+  ln -sf gsort ${bootstrapDest}/bin/sort
+  ln -sf gstat ${bootstrapDest}/bin/stat
+  ln -sf gstty ${bootstrapDest}/bin/stty
+  ln -sf gsplit ${bootstrapDest}/bin/split
+  ln -sf gsum ${bootstrapDest}/bin/sum
+  ln -sf gtac ${bootstrapDest}/bin/tac
+  ln -sf gtail ${bootstrapDest}/bin/tail
+  ln -sf gtee ${bootstrapDest}/bin/tee
+  ln -sf gtest ${bootstrapDest}/bin/test
+  ln -sf gtr ${bootstrapDest}/bin/tr
+  ln -sf gtrue ${bootstrapDest}/bin/true
+  ln -sf gtsort ${bootstrapDest}/bin/tsort
+  ln -sf gtty ${bootstrapDest}/bin/tty
+  ln -sf gunexpand ${bootstrapDest}/bin/unexpand
+  ln -sf guniq ${bootstrapDest}/bin/uniq
+  ln -sf gwc ${bootstrapDest}/bin/wc
+  ln -sf gyes ${bootstrapDest}/bin/yes
 
   cd ../..
 fi

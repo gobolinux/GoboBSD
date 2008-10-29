@@ -16,17 +16,24 @@ mkisofs (sysutils/cdrtools) for create_cdrom.sh
 INSTALL
 =======
 adapt create_env.inc
-mount FreeBSD release cdrom at /cdrom
+mount FreeBSD release cdrom at /cdrom - this
+is the version of FreeBSD that is going to
+be installed in the chroot.
 
 As superuser, run:
 1. create_scratch.sh
-2. create_rootdir.sh
-3. get_resources.sh
+2. get_resources.sh
+3. create_rootdir.sh
 4. enter_chroot.sh
-5. /System/Variable/tmp/bootstrap/run_bootstrap.sh
+5. cd /System/Variable/tmp/bootstrap
+6. ./run_bootstrap.sh
+7. exit chroot and run create_bootdir.sh
 
-DONE! You now have a basic system.
+DONE! You now have a basic system. Note that some
+system tools in the chroot (needed for Compile/
+Scripts) are only guarenteed to work if the main
+system runs the same version of FreeBSD as the one
+installed into the chroot.
 
-To optionally create iso-file, quit the chroot and run:
-6. create_bootdir.sh
+To optionally create iso-file, run:
 7. create_cdrom.sh myisofile

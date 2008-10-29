@@ -2,13 +2,10 @@
 
 umask 022
 
-bootstrapScriptsDir=$(pwd)
 if [ ! -f "${bootstrapScriptsDir}/bootstrap_finalize.sh" ]; then
   echo Please execute "$0" from its directory
   exit 201
 fi
-
-. ./bootstrap_env.inc
 
 export PYTHONPATH="${ROOT}/System/Links/Libraries/python2.3/site-packages:${ROOT}/System/Links/Libraries/python2.4/site-packages:${ROOT}/System/Links/Libraries/python2.5/site-packages${PYTHONPATH:+:$PYTHONPATH}"
 echo ----------------------------------------
@@ -23,9 +20,9 @@ chown 0:0 ${bootstrapDest}/etc/sudoers
 chmod 0440 ${bootstrapDest}/etc/sudoers
 
 # Scripts will provide install for us
-tar -xf src/Scripts--2.9.4--i686.tar.bz2 -C ${ROOT}/Programs
+tar -xf src/Scripts--2.9.5--i686.tar.bz2 -C ${ROOT}/Programs
 
-cd ${ROOT}/Programs/Scripts/?.?.?
+cd ${ROOT}/Programs/Scripts/*
 SCRIPTPROGDIR=$(pwd)
 SCRIPTPROGVER=$(basename $SCRIPTPROGDIR)
 
@@ -34,6 +31,11 @@ if [ -f ${bootstrapScriptsDir}/Scripts-${SCRIPTPROGVER}*.patch ]; then
     patch -Np2 < $f
   done
 fi
+
+cat >> ${SCRIPTPROGDIR}/Resources/Defaults/Settings/Scripts/Dependencies.blacklist << "EOF"
+Glibc
+Linux-PAM
+EOF
 
 ln -s $(basename ${SCRIPTPROGDIR}) ${SCRIPTPROGDIR}/../Current
 cp -R ${SCRIPTPROGDIR}/Resources/Defaults/Settings ${SCRIPTPROGDIR}/../Settings

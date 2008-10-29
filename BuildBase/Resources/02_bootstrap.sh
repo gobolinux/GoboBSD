@@ -2,9 +2,9 @@
 
 umask 022
 
-bootstrapScriptsDir=$(pwd)
+export bootstrapScriptsDir=$(pwd)
 if [ ! -f "${bootstrapScriptsDir}/02_bootstrap.sh" ]; then
-  echo Please execute $0 from its directory
+  echo "Please execute $0 from its directory"
   exit 201
 fi
 

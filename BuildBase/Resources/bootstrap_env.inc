@@ -1,7 +1,7 @@
-ROOT=
-bootstrapBase=${ROOT}/Programs/Bootstrap
-bootstrapVersion=1.0
-bootstrapDest=${bootstrapBase}/${bootstrapVersion}
+export ROOT=
+export bootstrapBase=${ROOT}/Programs/Bootstrap
+export bootstrapVersion=1.0
+export bootstrapDest=${bootstrapBase}/${bootstrapVersion}
 
-export PATH=${bootstrapDest}/bin:${bootstrapScriptsDir}/tmptools/bin:${ROOT}/Programs/Scripts/Current/bin${PATH:+:$PATH}
-export LD_LIBRARY_PATH=${bootstrapDest}/lib:${bootstrapScriptsDir}/tmptools/lib:${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+export PATH=${bootstrapDest}/bin:${ROOT}/Programs/Scripts/Current/bin${PATH:+:$PATH}
+export LD_LIBRARY_PATH=${bootstrapDest}/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}

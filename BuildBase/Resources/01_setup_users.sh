@@ -1,4 +1,4 @@
-#!/bin/sh -v
+#!/bin/sh
 
 # Make sure superuser is using correct home directory
 pw usermod -u 0 -c "SuperUser" -d /Users/root
@@ -23,3 +23,5 @@ pw useradd -D -b /Users -w no -s sh -g ""
 if [ -L /root ]; then
   rm /root
 fi
+
+exit 0
