@@ -7,11 +7,11 @@ SCRIPTDIR=$(pwd)
 
 ftpGnu=ftp://ftp.gnu.org/gnu
 
-if [ ! -d ./Resources/src ]; then
-  mkdir ./Resources/src || exit 1
+if [ ! -d ./Sources ]; then
+  mkdir ./Sources || exit 1
 fi
 
-cd ./Resources/src
+cd ./Sources
 
 BASEURL="$ftpGnu/bash/"
 PKG="bash-3.2.tar.gz"
@@ -43,8 +43,8 @@ if [ ! -f $PKG ]; then
   fetch ${BASEURL}${PKG} || exit 1
 fi
 
-BASEURL="http://python.org/ftp/python/2.5.2/"
-PKG="Python-2.5.2.tar.bz2"
+BASEURL="http://python.org/ftp/python/2.6/"
+PKG="Python-2.6.tar.bz2"
 if [ ! -f $PKG ]; then
   fetch ${BASEURL}${PKG} || exit 1
 fi

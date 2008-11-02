@@ -16,9 +16,16 @@ echo USER is ${USER}
 echo ---------------------------------------------------
 sleep 5
 
-if [ ! -d build ]; then
-  mkdir build
+if [ ! -d ${sourcesDir} ]; then
+  echo "No sources directory"
+  exit 201
 fi
+
+if [ ! -d ${archivesDir} ]; then
+  echo "No archives directory"
+  exit 201
+fi
+
 if [ ! -L ${bootstrapBase}/Current ]; then
   ln -s ${bootstrapVersion} ${bootstrapBase}/Current
 fi
@@ -28,11 +35,11 @@ if [ ! \( -x ${bootstrapDest}/bin/gsed -a -L ${bootstrapDest}/bin/sed \) ]; then
   echo Sed
   echo ---------------------------------------------------
   if [ ! -x ${bootstrapDest}/bin/gsed ]; then
-    if [ ! -d build/sed-4.1.5 ]; then
-      tar -xzf src/sed-4.1.5.tar.gz -C build
+    if [ ! -d ${sourcesDir}/sed-4.1.5 ]; then
+      tar -xzf ${archivesDir}/sed-4.1.5.tar.gz -C ${sourcesDir}
     fi
-    cd build/sed-4.1.5
-    for f in ../../sed-*.patch; do
+    cd ${sourcesDir}/sed-4.1.5
+    for f in ${bootstrapScriptsDir}/sed-*.patch; do
       patch -Np1 < $f
     done
     ./configure --prefix=${bootstrapDest}
@@ -46,23 +53,21 @@ if [ ! \( -x ${bootstrapDest}/bin/gsed -a -L ${bootstrapDest}/bin/sed \) ]; then
   fi
 
   ln -sf gsed ${bootstrapDest}/bin/sed
-  cd ../..
 fi
 
 if [ ! -x ${bootstrapDest}/bin/lzcat ]; then
   echo ---------------------------------------------------
   echo LZMA 
   echo ---------------------------------------------------
-  if [ ! -d build/lzma-4.32.5 ]; then
-    tar -xzf src/lzma-4.32.5.tar.gz -C build
+  if [ ! -d ${sourcesDir}/lzma-4.32.5 ]; then
+    tar -xzf ${archivesDir}/lzma-4.32.5.tar.gz -C ${sourcesDir}
   fi
-  cd build/lzma-4.32.5
+  cd ${sourcesDir}/lzma-4.32.5
   ./configure --prefix=${bootstrapDest} && make && make install
   
   if [ ! -x ${bootstrapDest}/bin/lzcat ]; then
     exit 200
   fi
-  cd ../..
 fi
 
 if [ ! \( -x ${bootstrapDest}/bin/greadlink -a -L ${bootstrapDest}/bin/readlink \) ]; then
@@ -70,10 +75,10 @@ if [ ! \( -x ${bootstrapDest}/bin/greadlink -a -L ${bootstrapDest}/bin/readlink 
   echo CoreUtils
   echo ---------------------------------------------------
   if [ ! -x ${bootstrapDest}/bin/greadlink ]; then
-    if [ ! -d build/coreutils-6.12 ]; then
-      ${bootstrapDest}/bin/lzcat src/coreutils-6.12.tar.lzma | tar xf - -C build
+    if [ ! -d ${sourcesDir}/coreutils-6.12 ]; then
+      ${bootstrapDest}/bin/lzcat ${archivesDir}/coreutils-6.12.tar.lzma | tar xf - -C ${sourcesDir}
     fi
-    cd build/coreutils-6.12
+    cd ${sourcesDir}/coreutils-6.12
     ./configure --prefix=$bootstrapDest --program-prefix=g && \
       make && make install
   fi
@@ -184,66 +189,61 @@ if [ ! \( -x ${bootstrapDest}/bin/greadlink -a -L ${bootstrapDest}/bin/readlink 
   ln -sf guniq ${bootstrapDest}/bin/uniq
   ln -sf gwc ${bootstrapDest}/bin/wc
   ln -sf gyes ${bootstrapDest}/bin/yes
-
-  cd ../..
 fi
 
 if [ ! -x ${bootstrapDest}/bin/find ]; then
   echo ---------------------------------------------------
   echo FindUtils
   echo ---------------------------------------------------
-  if [ ! -d build/findutils-4.4.0 ]; then
-    tar -xzf src/findutils-4.4.0.tar.gz -C build
+  if [ ! -d ${sourcesDir}/findutils-4.4.0 ]; then
+    tar -xzf ${archivesDir}/findutils-4.4.0.tar.gz -C ${sourcesDir}
   fi
-  cd build/findutils-4.4.0
+  cd ${sourcesDir}/findutils-4.4.0
 
   ./configure --prefix=${bootstrapDest} && make && make install
   if [ ! -x ${bootstrapDest}/bin/find ]; then
     exit 200
   fi
-  cd ../..
 fi
 
 if [ ! -x ${bootstrapDest}/bin/diff ]; then
   echo ---------------------------------------------------
   echo DiffUtils
   echo ---------------------------------------------------
-  if [ ! -d build/diffutils-2.8.1 ]; then
-    tar -xzf src/diffutils-2.8.1.tar.gz -C build
+  if [ ! -d ${sourcesDir}/diffutils-2.8.1 ]; then
+    tar -xzf ${archivesDir}/diffutils-2.8.1.tar.gz -C ${sourcesDir}
   fi
-  cd build/diffutils-2.8.1
+  cd ${sourcesDir}/diffutils-2.8.1
   ./configure --prefix=${bootstrapDest} && make && make install
 
   if [ ! -x ${bootstrapDest}/bin/diff ]; then
     exit 200
   fi
-  cd ../..
 fi
 
 #if [ ! -x ${bootstrapDest}/bin/bison ]; then
 #  echo ---------------------------------------------------
 #  echo Bison
 #  echo ---------------------------------------------------
-#  if [ ! -d build/bison ]; then
-#    tar -xzf src/bison.tar.gz -C build
+#  if [ ! -d ${sourcesDir}/bison ]; then
+#    tar -xzf ${archivesDir}/bison.tar.gz -C ${sourcesDir}
 #  fi
-#  cd build/bison
+#  cd ${sourcesDir}/bison
 #  ./configure --prefix=${bootstrapDest} && make && make install
 #
 #  if [ ! -x ${bootstrapDest}/bin/bison ]; then
 #    exit
 #  fi
-#  cd ../..
 #fi
 
 if [ ! -x ${bootstrapDest}/bin/perl ]; then
   echo ---------------------------------------------------
   echo Perl
   echo ---------------------------------------------------
-  if [ ! -d build/perl-5.10.0 ]; then
-    tar -xzf src/perl-5.10.0.tar.gz -C build
+  if [ ! -d ${sourcesDir}/perl-5.10.0 ]; then
+    tar -xzf ${archivesDir}/perl-5.10.0.tar.gz -C ${sourcesDir}
   fi
-  cd build/perl-5.10.0
+  cd ${sourcesDir}/perl-5.10.0
   sh Configure -de -Dcc=gcc -Duselargefiles -Uusesfio -Dprefix=${bootstrapDest} -Dinstallusrbinperl=n -Duseshrplib -Dlibperl='libperl.so.5.10' -Dlibpth="/System/Links/Libraries ${bootstrapDest}/lib" cf_by='GoboLinux' && make && make install &&
   (eval $(${bootstrapDest}/bin/perl -V:archlibexp);
   ln -s libperl.so.5.10 "${archlibexp}/CORE/libperl.so.5";
@@ -259,58 +259,59 @@ if [ ! -x ${bootstrapDest}/bin/m4 ]; then
   echo ---------------------------------------------------
   echo M4
   echo ---------------------------------------------------
-  if [ ! -d build/m4-1.4.11 ]; then
-    ${bootstrapDest}/bin/lzcat src/m4-1.4.11.tar.lzma | tar xf - -C build
+  if [ ! -d ${sourcesDir}/m4-1.4.11 ]; then
+    ${bootstrapDest}/bin/lzcat ${archivesDir}/m4-1.4.11.tar.lzma \
+      | tar xf - -C ${sourcesDir}
   fi
-  cd build/m4-1.4.11
+  cd ${sourcesDir}/m4-1.4.11
   ./configure --prefix=${bootstrapDest} && make && make install
 
   if [ ! -x ${bootstrapDest}/bin/m4 ]; then
     exit 200
   fi
-  cd ../..
 fi
 
 if [ ! -x ${bootstrapDest}/bin/autoconf ]; then
   echo ---------------------------------------------------
   echo Autoconf
   echo ---------------------------------------------------
-  if [ ! -d build/autoconf-2.62 ]; then
-    ${bootstrapDest}/bin/lzcat src/autoconf-2.62.tar.lzma | tar xf - -C build
+  if [ ! -d ${sourcesDir}/autoconf-2.62 ]; then
+    ${bootstrapDest}/bin/lzcat ${archivesDir}/autoconf-2.62.tar.lzma \
+      | tar xf - -C ${sourcesDir}
   fi
-  cd build/autoconf-2.62
+  cd ${sourcesDir}/autoconf-2.62
   ./configure --prefix=${bootstrapDest} && make && make install
   
   if [ ! -x ${bootstrapDest}/bin/autoconf ]; then
     exit 200
   fi
-  cd ../..
 fi
 
 if [ ! -x ${bootstrapDest}/bin/automake ]; then
   echo ---------------------------------------------------
   echo Automake
   echo ---------------------------------------------------
-  if [ ! -d build/automake-1.10.1 ]; then
-    ${bootstrapDest}/bin/lzcat src/automake-1.10.1.tar.lzma | tar xf - -C build
+  if [ ! -d ${sourcesDir}/automake-1.10.1 ]; then
+    ${bootstrapDest}/bin/lzcat ${archivesDir}/automake-1.10.1.tar.lzma \
+      | tar xf - -C ${sourcesDir}
   fi
-  cd build/automake-1.10.1
+  cd ${sourcesDir}/automake-1.10.1
   ./configure --prefix=${bootstrapDest} && make && make install
 
   if [ ! -x ${bootstrapDest}/bin/automake ]; then
     exit 200
   fi
-  cd ../..
 fi
 
 if [ ! -x ${bootstrapDest}/bin/libtool ]; then
   echo ---------------------------------------------------
   echo LibTool
   echo ---------------------------------------------------
-  if [ ! -d build/libtool-2.2.6 ]; then
-    ${bootstrapDest}/bin/lzcat src/libtool-2.2.6a.tar.lzma | tar xf - -C build
+  if [ ! -d ${sourcesDir}/libtool-2.2.6 ]; then
+    ${bootstrapDest}/bin/lzcat ${archivesDir}/libtool-2.2.6a.tar.lzma \
+      | tar xf - -C ${sourcesDir}
   fi
-  cd build/libtool-2.2.6
+  cd ${sourcesDir}/libtool-2.2.6
   ./configure --prefix=${bootstrapDest} && make && make install
 
   if [ ! -x ${bootstrapDest}/bin/libtool ]; then
@@ -323,10 +324,10 @@ if [ ! -x ${bootstrapDest}/bin/pcre-config ]; then
   echo ---------------------------------------------------
   echo PCRE
   echo ---------------------------------------------------
-  if [ ! -d build/pcre-7.7 ]; then
-    tar -xjf src/pcre-7.7.tar.bz2 -C build
+  if [ ! -d ${sourcesDir}/pcre-7.7 ]; then
+    tar -xjf ${archivesDir}/pcre-7.7.tar.bz2 -C ${sourcesDir}
   fi
-  cd build/pcre-7.7
+  cd ${sourcesDir}/pcre-7.7
   ./configure --prefix=${bootstrapDest} && make && make install
 
   if [ ! -x ${bootstrapDest}/bin/pcre-config ]; then
@@ -339,11 +340,11 @@ if [ ! -x ${bootstrapDest}/bin/grep ]; then
   echo ---------------------------------------------------
   echo Grep
   echo ---------------------------------------------------
-  if [ ! -d build/grep-2.5.3 ]; then
-    tar -xjf src/grep-2.5.3.tar.bz2 -C build
+  if [ ! -d ${sourcesDir}/grep-2.5.3 ]; then
+    tar -xjf ${archivesDir}/grep-2.5.3.tar.bz2 -C ${sourcesDir}
   fi
-  cd build/grep-2.5.3
-  for f in ../../grep-*.patch; do
+  cd ${sourcesDir}/grep-2.5.3
+  for f in ${bootstrapScriptsDir}/grep-*.patch; do
     patch -Np1 < $f
   done
 
@@ -354,50 +355,47 @@ if [ ! -x ${bootstrapDest}/bin/grep ]; then
   if [ ! -x ${bootstrapDest}/bin/grep ]; then
     exit 200
   fi
-  cd ../..
 fi
 
 if [ ! -x ${bootstrapDest}/bin/bash ]; then
   echo ---------------------------------------------------
   echo Bash
   echo ---------------------------------------------------
-  if [ ! -d build/bash-3.2 ]; then
-    tar -xzf src/bash-3.2.tar.gz -C build
+  if [ ! -d ${sourcesDir}/bash-3.2 ]; then
+    tar -xzf ${archivesDir}/bash-3.2.tar.gz -C ${sourcesDir}
   fi
-  cd build/bash-3.2
+  cd ${sourcesDir}/bash-3.2
   ./configure --prefix=$bootstrapDest && make && make install
 
   if [ ! -x ${bootstrapDest}/bin/bash ]; then
     exit 200
   fi
-  cd ../..
 fi
 
 if [ ! -x ${bootstrapDest}/bin/sudo ]; then
   echo ---------------------------------------------------
   echo Sudo
   echo ---------------------------------------------------
-  if [ ! -d build/sudo-1.6.9p15 ]; then
-    tar -xzf src/sudo-1.6.9p15.tar.gz -C build
+  if [ ! -d ${sourcesDir}/sudo-1.6.9p15 ]; then
+    tar -xzf ${archivesDir}/sudo-1.6.9p15.tar.gz -C ${sourcesDir}
   fi
-  cd build/sudo-1.6.9p15
+  cd ${sourcesDir}/sudo-1.6.9p15
   ./configure --prefix=$bootstrapDest --with-runas-default="#0" --without-sendmail --with-mailto="" --with-stow --with-env-editor && make && make install
 
   if [ ! -x ${bootstrapDest}/bin/sudo ]; then
     exit 200
   fi
-  cd ../..
 fi
 
 if [ ! -x ${bootstrapDest}/bin/wget ]; then
   echo ---------------------------------------------------
   echo Wget
   echo ---------------------------------------------------
-  if [ ! -d build/wget-1.11.4 ]; then
-    tar -xzf src/wget-1.11.4.tar.gz -C build
+  if [ ! -d ${sourcesDir}/wget-1.11.4 ]; then
+    tar -xzf ${archivesDir}/wget-1.11.4.tar.gz -C ${sourcesDir}
   fi
-  cd build/wget-1.11.4
-  for f in ../../wget-*.patch; do
+  cd ${sourcesDir}/wget-1.11.4
+  for f in ${bootstrapScriptsDir}/wget-*.patch; do
     patch -Np1 < $f
   done
   ./configure --prefix=$bootstrapDest && make && make install
@@ -408,38 +406,50 @@ if [ ! -x ${bootstrapDest}/bin/wget ]; then
   cd ../..
 fi
 
+if [ ! -x ${bootstrapDest}/bin/openssl ]; then
+  echo ---------------------------------------------------
+  echo OpenSSL
+  echo ---------------------------------------------------
+  if [ ! -d ${sourcesDir}/openssl-0.9.8i ]; then
+    tar -xjf ${archivesDir}/openssl-0.9.8i.tar.gz -C ${sourcesDir}
+  fi
+  cd ${sourcesDir}/openssl-0.9.8i
+  ./Configure BSD-x86-elf shared --prefix=$bootstrapDest && make && make install
+
+  if [ ! -x ${bootstrapDest}/bin/openssl ]; then
+    exit 200
+  fi
+fi
+
 if [ ! -x ${bootstrapDest}/bin/python ]; then
   echo ---------------------------------------------------
   echo Python
   echo ---------------------------------------------------
-  if [ ! -d build/python-2.5.2 ]; then
-    tar -xjf src/Python-2.5.2.tar.bz2 -C build
+  if [ ! -d ${sourcesDir}/Python-2.6 ]; then
+    tar -xjf ${archivesDir}/Python-2.6.tar.bz2 -C ${sourcesDir}
   fi
-  cd build/Python-2.5.2
+  cd ${sourcesDir}/Python-2.6
   ./configure --prefix=$bootstrapDest && make && make install
 
   if [ ! -x ${bootstrapDest}/bin/python ]; then
     exit 200
   fi
-  cd ../..
 fi
 
 if [ ! -x ${bootstrapDest}/bin/gmake ]; then
   echo ---------------------------------------------------
   echo Make
   echo ---------------------------------------------------
-  if [ ! -d build/make-3.81 ]; then
-    tar -xjf src/make-3.81.tar.bz2 -C build
+  if [ ! -d ${sourcesDir}/make-3.81 ]; then
+    tar -xjf ${archivesDir}/make-3.81.tar.bz2 -C ${sourcesDir}
   fi
-  cd build/make-3.81
+  cd ${sourcesDir}/make-3.81
   ./configure --prefix=$bootstrapDest --program-prefix=g && make && make install
 
   if [ ! -x ${bootstrapDest}/bin/gmake ]; then
     exit 200
   fi
   ln -s gmake ${bootstrapDest}/bin/make
-
-  cd ../..
 fi
 
 exit 0

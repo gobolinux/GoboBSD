@@ -25,7 +25,7 @@ As superuser, run:
 2. get_resources.sh
 3. create_rootdir.sh
 4. enter_chroot.sh
-5. cd /System/Variable/tmp/bootstrap
+5. cd /Users/root/bootstrap
 6. ./run_bootstrap.sh
 7. exit chroot and run create_bootdir.sh
 

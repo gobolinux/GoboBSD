@@ -3,11 +3,11 @@
 umask 022
 
 if [ ! -f "${bootstrapScriptsDir}/bootstrap_finalize.sh" ]; then
-  echo Please execute "$0" from its directory
-  exit 201
+	echo "Please execute $0 from its directory"
+	exit 201
 fi
 
-export PYTHONPATH="${ROOT}/System/Links/Libraries/python2.3/site-packages:${ROOT}/System/Links/Libraries/python2.4/site-packages:${ROOT}/System/Links/Libraries/python2.5/site-packages${PYTHONPATH:+:$PYTHONPATH}"
+# export PYTHONPATH="${ROOT}/System/Links/Libraries/python2.3/site-packages:${ROOT}/System/Links/Libraries/python2.4/site-packages:${ROOT}/System/Links/Libraries/python2.5/site-packages${PYTHONPATH:+:$PYTHONPATH}"
 echo ----------------------------------------
 echo PATH is $PATH
 echo ----------------------------------------
@@ -18,19 +18,32 @@ chown 0:0 ${bootstrapDest}/bin/sudo
 chmod 4111 ${bootstrapDest}/bin/sudo
 chown 0:0 ${bootstrapDest}/etc/sudoers
 chmod 0440 ${bootstrapDest}/etc/sudoers
+chown -R 0:0 ${ROOT}/Files/Compile
 
 # Scripts will provide install for us
-tar -xf src/Scripts--2.9.5--i686.tar.bz2 -C ${ROOT}/Programs
+tar -xf ${archivesDir}/Scripts--2.9.5--i686.tar.bz2 -C ${ROOT}/Programs
+
+if [ ! -d ${ROOT}/Programs/Scripts ]; then
+	exit 200
+fi
 
 cd ${ROOT}/Programs/Scripts/*
 SCRIPTPROGDIR=$(pwd)
 SCRIPTPROGVER=$(basename $SCRIPTPROGDIR)
 
-if [ -f ${bootstrapScriptsDir}/Scripts-${SCRIPTPROGVER}*.patch ]; then
-  for f in ${bootstrapScriptsDir}/Scripts-${SCRIPTPROGVER}*.patch; do
-    patch -Np2 < $f
-  done
+set -f
+SCRIPTPATCHES="Scripts-${SCRIPTPROGVER}*.patch"
+set +f
+SCRIPTPATCHESEXP=$(cd ${bootstrapScriptsDir}/; echo ${SCRIPTPATCHES})
+if [ "x${SCRIPTPATCHESEXP}" = "x${SCRIPTPATCHES}" ]; then
+	SCRIPTPATCHESEXP=""
 fi
+SCRIPTPATCHES=${SCRIPTPATCHESEXP}
+unset SCRIPTPATCHESEXP
+
+for f in ${SCRIPTPATCHES}; do
+	patch -Np2 < ${bootstrapScriptsDir}/$f
+done
 
 cat >> ${SCRIPTPROGDIR}/Resources/Defaults/Settings/Scripts/Dependencies.blacklist << "EOF"
 Glibc
@@ -78,8 +91,12 @@ else
 fi
 
 # Post-install work
-echo "import site" > ${bootstrapDest}/lib/python2.5/sitecustomize.py
-echo 'site.addsitedir("/System/Links/Libraries/python2.5/site-packages/")' >> ${bootstrapDest}/lib/python2.5/sitecustomize.py
-echo 'site.addsitedir("/System/Links/Libraries/python2.4/site-packages/")' >> ${bootstrapDest}/lib/python2.5/sitecustomize.py
-echo 'site.addsitedir("/System/Links/Libraries/python2.3/site-packages/")' >> ${bootstrapDest}/lib/python2.5/sitecustomize.py
+echo "import site" > ${bootstrapDest}/lib/python2.6/sitecustomize.py
+echo 'site.addsitedir("/System/Links/Libraries/python2.6/site-packages/")' >> ${bootstrapDest}/lib/python2.6/sitecustomize.py
+echo 'site.addsitedir("/System/Links/Libraries/python2.5/site-packages/")' >> ${bootstrapDest}/lib/python2.6/sitecustomize.py
+echo 'site.addsitedir("/System/Links/Libraries/python2.4/site-packages/")' >> ${bootstrapDest}/lib/python2.6/sitecustomize.py
+echo 'site.addsitedir("/System/Links/Libraries/python2.3/site-packages/")' >> ${bootstrapDest}/lib/python2.6/sitecustomize.py
 
+compilepkg='Compile--*'
+compilepkg=$(cd /Files/Compile/Archives; echo ${compilepkg})
+InstallPackage -b -C -D -W "/Files/Compile/Archives/$compilepkg"

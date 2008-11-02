@@ -14,6 +14,7 @@ mkdir ${ROOTDIR}/Files
 mkdir ${ROOTDIR}/Files/Compile
 mkdir ${ROOTDIR}/Files/Compile/Archives
 mkdir ${ROOTDIR}/Files/Compile/Sources
+mkdir ${ROOTDIR}/Files/Compile/Recipes
 mkdir ${ROOTDIR}/Mounts
 mkdir ${ROOTDIR}/Mounts/CD-ROM
 mkdir ${ROOTDIR}/Mounts/Floppy
@@ -247,27 +248,39 @@ tar -cf - -C ${BASEDIR}/${BSDREL}/Resources/Defaults/Settings . | \
 # Copy skeleton directory to superuser's homedir
 tar -cf - -C ${BASEDIR}/Settings/skel . | tar -xpf - -C ${ROOTDIR}/Users/root
 
-for f in ${ROOTDIR}/${BASE}/${BSDREL}/bin/*; do
-	ln -s /${BASE}/${BSDREL}/bin/$(basename $f) ${ROOTDIR}/System/Links/Executables
-done
-for f in ${ROOTDIR}/${TOOL}/${BSDREL}/bin/*; do
-	ln -s /${TOOL}/${BSDREL}/bin/$(basename $f) ${ROOTDIR}/System/Links/Executables
-done
-for f in ${ROOTDIR}/${BASE}/${BSDREL}/lib/*; do
-	ln -s /${BASE}/${BSDREL}/lib/$(basename $f) ${ROOTDIR}/System/Links/Libraries
-done
-for f in ${ROOTDIR}/${TOOL}/${BSDREL}/lib/*; do
-	ln -s /${TOOL}/${BSDREL}/lib/$(basename $f) ${ROOTDIR}/System/Links/Libraries
-done
-for f in ${ROOTDIR}/${BASE}/${BSDREL}/libexec/*; do
-	ln -s /${BASE}/${BSDREL}/libexec/$(basename $f) ${ROOTDIR}/System/Links/Libraries
-done
-for f in ${ROOTDIR}/${BASE}/${BSDREL}/include/*; do
-	ln -s /${BASE}/${BSDREL}/include/$(basename $f) ${ROOTDIR}/System/Links/Headers
-done
-for f in ${ROOTDIR}/${BASE}/Settings/*; do
-	ln -s /${BASE}/Settings/$(basename $f) ${ROOTDIR}/System/Settings
-done
+dirlink()
+{
+  local fromdir;
+  local todir;
+  local f;
+  
+  fromdir="$1";
+  todir="$2";
+
+  if [ "x${fromdir}" = "x" ]; then
+    return 1
+  fi
+
+  if [ "x${todir}" = "x" ]; then
+    return 1
+  fi
+
+  echo Linking ${fromdir} to ${todir}
+  for f in ${ROOTDIR}/${fromdir}/*; do
+    ln -s /${fromdir}/$(basename $f) ${ROOTDIR}/${todir}
+  done
+}
+
+dirlink ${BASE}/${BSDREL}/bin System/Links/Executables
+dirlink ${TOOL}/${BSDREL}/bin System/Links/Executables
+
+dirlink ${BASE}/${BSDREL}/lib System/Links/Libraries
+dirlink ${TOOL}/${BSDREL}/lib System/Links/Libraries
+dirlink ${BASE}/${BSDREL}/libexec System/Links/Libraries
+
+dirlink ${BASE}/${BSDREL}/include System/Links/Headers
+
+dirlink ${BASE}/Settings System/Settings
 
 tar -cf - -C ${DESTDIR}/boot ./boot ./mbr | tar -xpf - -C ${ROOTDIR}/boot/
 
@@ -286,18 +299,12 @@ tar -cf - -C ${DESTDIR}/usr/share/mk . | tar -xpf - -C ${BASEDIR}/${BSDREL}/Shar
 
 # Shared/mk links
 mkdir ${ROOTDIR}/System/Links/Shared/mk
-for f in ${ROOTDIR}/${BASE}/${BSDREL}/Shared/mk/*; do
-	ln -s /${BASE}/${BSDREL}/Shared/mk/$(basename $f) ${ROOTDIR}/System/Links/Shared/mk
-done
+dirlink ${BASE}/${BSDREL}/Shared/mk System/Links/Shared/mk
 
 # Shared/misc links
 mkdir ${ROOTDIR}/System/Links/Shared/misc
-for f in ${ROOTDIR}/${BASE}/${BSDREL}/Shared/misc/*; do
-	ln -s /${BASE}/${BSDREL}/Shared/misc/$(basename $f) ${ROOTDIR}/System/Links/Shared/misc
-done
-for f in ${ROOTDIR}/${TOOL}/${BSDREL}/Shared/misc/*; do
-	ln -s /${TOOL}/${BSDREL}/Shared/misc/$(basename $f) ${ROOTDIR}/System/Links/Shared/misc
-done
+dirlink ${BASE}/${BSDREL}/Shared/misc System/Links/Shared/misc
+dirlink ${TOOL}/${BSDREL}/Shared/misc System/Links/Shared/misc
 
 # Add system's default user/group files
 tar -cf - -C ${DESTDIR}/etc ./master.passwd ./passwd ./group ./spwd.db ./pwd.db ./login.conf | tar -xpf - -C ${ROOTDIR}/etc
@@ -333,8 +340,10 @@ echo "014.01" > ${ROOTDIR}/System/Settings/GoboLinuxVersion
 # already there)
 ./get_resources.sh || exit 1
 
-mkdir ${ROOTDIR}/System/Variable/tmp/bootstrap
-tar -cf - -C ./Resources . | tar -xpf - -C ${ROOTDIR}/System/Variable/tmp/bootstrap
-chmod u+x ${ROOTDIR}/System/Variable/tmp/bootstrap/*.sh
+mkdir ${ROOTDIR}/Users/root/bootstrap
+tar -cf - -C ./Resources . | tar -xpf - -C ${ROOTDIR}/Users/root/bootstrap
+chmod u+x ${ROOTDIR}/Users/root/bootstrap/run_bootstrap.sh
+
+tar -cf - -C ./Sources . | tar -xpf - -C ${ROOTDIR}/Files/Compile/Archives
 
 exit 0
