@@ -2,10 +2,13 @@
 
 umask 022
 
-if [ ! -f "${bootstrapScriptsDir}/bootstrap_finalize.sh" ]; then
+export bootstrapScriptsDir=$(pwd)
+if [ ! -f "${bootstrapScriptsDir}/03_bootstrap_finalize.sh" ]; then
 	echo "Please execute $0 from its directory"
 	exit 201
 fi
+
+. ./bootstrap_env.inc
 
 # export PYTHONPATH="${ROOT}/System/Links/Libraries/python2.3/site-packages:${ROOT}/System/Links/Libraries/python2.4/site-packages:${ROOT}/System/Links/Libraries/python2.5/site-packages${PYTHONPATH:+:$PYTHONPATH}"
 echo ----------------------------------------
@@ -96,6 +99,9 @@ echo 'site.addsitedir("/System/Links/Libraries/python2.6/site-packages/")' >> ${
 echo 'site.addsitedir("/System/Links/Libraries/python2.5/site-packages/")' >> ${bootstrapDest}/lib/python2.6/sitecustomize.py
 echo 'site.addsitedir("/System/Links/Libraries/python2.4/site-packages/")' >> ${bootstrapDest}/lib/python2.6/sitecustomize.py
 echo 'site.addsitedir("/System/Links/Libraries/python2.3/site-packages/")' >> ${bootstrapDest}/lib/python2.6/sitecustomize.py
+
+# Change shell to bash for FiboSandbox user
+pw usermod fibo -s bash
 
 compilepkg='Compile--*'
 compilepkg=$(cd /Files/Compile/Archives; echo ${compilepkg})

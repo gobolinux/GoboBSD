@@ -34,4 +34,3 @@ chown -R fibo ${bootstrapScriptsDir}
 chown -R fibo ${sourcesDir}
 
 su fibo ./bootstrap_build.sh || exit 200
-sh ./bootstrap_finalize.sh

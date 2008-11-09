@@ -4,7 +4,7 @@
 pw usermod -u 0 -c "SuperUser" -d /Users/root
 
 # Add fibo user/group
-# Note that since zsh isn't installed yet, sh will
+# Note that since bash isn't installed yet, sh will
 # have to do as shell for now
 pw useradd -D -u 1,99 -g ""
 pw useradd fibo -c "FiboSandbox user" -d /tmp -s sh
