@@ -25,7 +25,7 @@ diff -x SuperUserName -x List -x LinkOrExpandAll -x IsExecutable -x FindDependen
 -	   "Power Macintosh") arch=ppc ;;
 +      arm*) arch=arm ;;
 +      "Power Macintosh") arch=ppc ;;
-+      i[345]*) arch=i686 ;;
++      i[345]86*) arch=i686 ;;
 +      amd64) arch=x86_64 ;;
     esac
  
