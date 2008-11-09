@@ -23,8 +23,35 @@ chown 0:0 ${bootstrapDest}/etc/sudoers
 chmod 0440 ${bootstrapDest}/etc/sudoers
 chown -R 0:0 ${ROOT}/Files/Compile
 
+getlastarg()
+{
+	shift $(($# - 1))
+	echo $1
+}
+
+findarchive()
+{
+	set -f
+	local myarchive="${1}*"
+	set +f
+
+	myarchiveExp=$(cd ${archivesDir}; echo ${myarchive})
+	if [ "x${myarchiveExp}" = "x${myarchive}" ]; then
+		return 1
+	fi
+	myarchive=$(getlastarg ${myarchiveExp})
+	echo ${myarchive}
+	return 0
+}
+
 # Scripts will provide install for us
-tar -xf ${archivesDir}/Scripts--2.9.5--i686.tar.bz2 -C ${ROOT}/Programs
+scriptarchive=$(findarchive "Scripts--")
+if [ "x${scriptarchive}" = "x" ]; then
+	echo "No Scripts archive to unpack"
+	exit 200
+fi
+
+tar -xf ${archivesDir}/${scriptarchive} -C ${ROOT}/Programs
 
 if [ ! -d ${ROOT}/Programs/Scripts ]; then
 	exit 200
@@ -103,6 +130,10 @@ echo 'site.addsitedir("/System/Links/Libraries/python2.3/site-packages/")' >> ${
 # Change shell to bash for FiboSandbox user
 pw usermod fibo -s bash
 
-compilepkg='Compile--*'
-compilepkg=$(cd /Files/Compile/Archives; echo ${compilepkg})
-InstallPackage -b -C -D -W "/Files/Compile/Archives/$compilepkg"
+compilepkg=$(findarchive "Compile--")
+if [ "x${compilepkg}" = "x" ]; then
+	echo "No Compile archive found"
+	exit 200
+fi
+
+InstallPackage -b -C -D -W "${archivesDir}/${compilepkg}"

@@ -1,0 +1,47 @@
+This normalizes architectures i386, i486, i586 to i686
+(which represent all 32-bit x86 processors) and amd64 to x86_64
+(which represents all 64-bit x86 processors).
+
+Rationale:
+If we (at some point in the future) want to support common patches
+for 32/64-bits x86 processors, across all kerneltypes, they need
+to agree on the architecture.
+
+This patch will only affect i386.Darwin and i386.FreeBSD, both which
+have ~3-4 recipes in the repository at the time this patch was created
+(those few recipes will need to be updated to use i686.Darwin and
+i686.FreeBSD)
+
+The patch also fixes identation in Get_Architecture function
+
+diff -x SuperUserName -x List -x LinkOrExpandAll -x IsExecutable -x FindDependencies -x usleep -x RescueSymlinkProgram -x CommandNotFound -x GetSupportedFilesystems -x '*.pyc' -Naur Scripts/2.9.5-org/Functions/GoboLinux Scripts/2.9.5/Functions/GoboLinux
+--- Scripts/2.9.5-org/Functions/GoboLinux	2008-10-28 19:35:53.000000000 +0000
++++ Scripts/2.9.5/Functions/GoboLinux	2008-11-09 20:28:39.000000000 +0000
+@@ -7,17 +7,19 @@
+    [ "$1" = "" ] && arch=`uname -m` || arch="$1"
+ 
+    case "$arch" in
+-	   arm*) arch=arm ;;
+-	   "Power Macintosh") arch=ppc ;;
++      arm*) arch=arm ;;
++      "Power Macintosh") arch=ppc ;;
++      i[345]*) arch=i686 ;;
++      amd64) arch=x86_64 ;;
+    esac
+ 
+-	kernelType="`uname -s`"
++   kernelType="`uname -s`"
+ 
+-	case "$kernelType" in
+-		[lL]inux) kernelType="";;
+-		CYGWIN*) kernelType=".Cygwin" ;;
+-		*) kernelType=".$kernelType" ;;
+-	esac
++   case "$kernelType" in
++      [lL]inux) kernelType="";;
++      CYGWIN*) kernelType=".Cygwin" ;;
++      *) kernelType=".$kernelType" ;;
++   esac
+ 
+    echo "$arch$kernelType"
+ }
