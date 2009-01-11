@@ -110,13 +110,13 @@ if [ ! -f $PKG ]; then
 fi
 
 BASEURL="http://kundor.org/gobo/packages/official/"
-PKG="Scripts--2.9.5--i686.tar.bz2"
+PKG="Scripts--2.9.6--i686.tar.bz2"
 if [ ! -f ${PKG} ]; then
   fetch -o ${PKG} ${BASEURL}${PKG} || exit 1
 fi
 
 BASEURL="http://kundor.org/gobo/packages/official/"
-PKG="Compile--1.11.3--i686.tar.bz2"
+PKG="Compile--1.11.4--i686.tar.bz2"
 if [ ! -f ${PKG} ]; then
   fetch -o ${PKG} ${BASEURL}${PKG} || exit 1
 fi

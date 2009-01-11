@@ -1,0 +1,14 @@
+This removes an unnecessary "cut" operation (it's a no-op)
+
+diff -Naur Scripts-org/2.9.6/Resources/Defaults/Settings/completion.bash Scripts/2.9.6/Resources/Defaults/Settings/completion.bash
+--- Scripts-org/2.9.6/Resources/Defaults/Settings/completion.bash	2008-12-21 15:27:22.000000000 +0000
++++ Scripts/2.9.6/Resources/Defaults/Settings/completion.bash	2008-12-21 15:41:02.000000000 +0000
+@@ -516,7 +516,7 @@
+ 		;;
+ 	-fstype)
+ 		# this is highly non-portable
+-		COMPREPLY=( $( GetSupportedFilesystems | cut -d$'\t' -f 2 | grep ^$cur))
++		COMPREPLY=( $( GetSupportedFilesystems | grep ^$cur))
+ 		return 0
+ 		;;
+ 	-gid)

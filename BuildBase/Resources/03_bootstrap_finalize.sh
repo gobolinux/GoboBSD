@@ -62,7 +62,7 @@ SCRIPTPROGDIR=$(pwd)
 SCRIPTPROGVER=$(basename $SCRIPTPROGDIR)
 
 set -f
-SCRIPTPATCHES="Scripts-${SCRIPTPROGVER}*.patch"
+SCRIPTPATCHES="Scripts-${SCRIPTPROGVER}-*.patch"
 set +f
 SCRIPTPATCHESEXP=$(cd ${bootstrapScriptsDir}/; echo ${SCRIPTPATCHES})
 if [ "x${SCRIPTPATCHESEXP}" = "x${SCRIPTPATCHES}" ]; then
@@ -129,6 +129,9 @@ echo 'site.addsitedir("/System/Links/Libraries/python2.3/site-packages/")' >> ${
 
 # Change shell to bash for FiboSandbox user
 pw usermod fibo -s bash
+
+# Change shell to bash for superuser
+pw usermod -uid 0 -s bash
 
 compilepkg=$(findarchive "Compile--")
 if [ "x${compilepkg}" = "x" ]; then

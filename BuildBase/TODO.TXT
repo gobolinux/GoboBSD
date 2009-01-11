@@ -2,9 +2,8 @@ Enhancement: better error checking (maybe use Makefile instead of shell scripts)
 
 Add more utils to get_resources.sh
 
-Make bootstrap inside the chroot produce a working system ;)
+More patches to make Scripts/Compile work properly
 
-. Test the run_bootstrap.sh script
 . Run Compile for applications inside chroot
 
   Openssl before Python (to make Compile+python work with sha)

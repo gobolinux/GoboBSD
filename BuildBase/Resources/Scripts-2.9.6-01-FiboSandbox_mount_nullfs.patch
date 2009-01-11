@@ -1,0 +1,24 @@
+FreeBSD doesn't use bind option to mirror directories, but
+the nullfs filesystem instead.
+
+diff -Naur Scripts-org/2.9.6/bin/FiboSandbox Scripts/2.9.6/bin/FiboSandbox
+--- Scripts-org/2.9.6/bin/FiboSandbox	2008-12-21 15:27:21.000000000 +0000
++++ Scripts/2.9.6/bin/FiboSandbox	2008-12-21 15:29:08.000000000 +0000
+@@ -163,7 +163,7 @@
+ if [ "$domount" = "1" ]
+ then
+     oldpwd="$PWD"
+-    mount --bind "." "$sandboxroot"
++    mount -t nullfs "." "$sandboxroot"
+     cd "$sandboxroot"
+ fi
+ 
+@@ -172,7 +172,7 @@
+     rhs=$(echo $each | cut -d= -f2)
+     Assert_Dir $lhs
+     Assert_Dir $rhs
+-    mount -o bind $lhs $rhs
++    mount -t nullfs $lhs $rhs
+     [ "$?" = "0" ] || error=true
+     '
+ [ "$error" = "false" ] || fibo_die "Unable to mount map areas in unmanaged directory"
